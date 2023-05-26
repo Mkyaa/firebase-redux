@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, sendEmailVerification, signOut } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, sendEmailVerification, signOut, GoogleAuthProvider, signInWithPopup, signInWithRedirect } from "firebase/auth";
 
 //redux
 import store from "../redux/app/store";
@@ -20,17 +20,19 @@ const firebaseConfig = {
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 
+const provider = new GoogleAuthProvider();
 const auth = getAuth()
+
 
 //register
 export const register = async (email, password) => {
     try {
-        const user = await createUserWithEmailAndPassword(auth, email, password,)
-        return user
+        await createUserWithEmailAndPassword(auth, email, password,)
+        return true
     }
     catch (error) {
         error.code === 'auth/email-already-in-use'
-            ? toast.error('Email already in use')
+            ? toast.error('Email Already In Use')
             : error.code === 'auth/invalid-email'
                 ? toast.error('Invalid Email')
                 : error.code === 'auth/weak-password'
@@ -51,7 +53,7 @@ export const signIn = async (email, password) => {
             photoURL: user.user.photoURL,
             uid: user.user.uid
         }))
-        return user
+        return true
     }
     catch (error) {
         error.code === 'auth/invalid-email'
@@ -105,5 +107,42 @@ export const logout = async () => {
         error.code === 'auth/too-many-requests'
             ? toast.error('Too Many Requests')
             : toast.error(error.message)
+    }
+}
+
+//google login
+export const googleLogin = async () => {
+    try {
+        const result = await signInWithPopup(auth, provider)
+        const user = result.user
+        store.dispatch(login({
+            displayName: user.displayName,
+            email: user.email,
+            emailVerified: user.emailVerified,
+            phoneNumber: user.phoneNumber,
+            photoURL: user.photoURL,
+            uid: user.uid
+        }))
+        return true
+    } catch (error) {
+        error.code === 'auth/account-exists-with-different-credential'
+            ? toast.error('Account Exists With Different Credential')
+            : error.code === 'auth/auth-domain-config-required'
+                ? toast.error('Auth Domain Config Required')
+                : error.code === 'auth/cancelled-popup-request'
+                    ? toast.error('Cancelled Popup Request')
+                    : error.code === 'auth/credential-already-in-use'
+                        ? toast.error('Credential Already In Use')
+                        : error.code === 'auth/operation-not-allowed'
+                            ? toast.error('Operation Not Allowed')
+                            : error.code === 'auth/operation-not-supported-in-this-environment'
+                                ? toast.error('Operation Not Supported In This Environment')
+                                : error.code === 'auth/popup-blocked'
+                                    ? toast.error('Popup Blocked')
+                                    : error.code === 'auth/popup-closed-by-user'
+                                        ? toast.error('Popup Closed By User')
+                                        : error.code === 'auth/unauthorized-domain'
+                                            ? toast.error('Unauthorized Domain')
+                                            : toast.error(error.message)
     }
 }

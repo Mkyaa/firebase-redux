@@ -22,9 +22,11 @@ const SignUp = () => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
-            await register(email, password)
+          const result = await register(email, password)
+          if (result) {
             toast.success('Account created successfully')
             navigate('/login')
+          }
         }
         catch (error) {
             toast.error(error.message)
@@ -32,7 +34,7 @@ const SignUp = () => {
     }
 
     return (
-        <form onSubmit={handleSubmit} className='max-w-2xl mx-auto mt-20 flex flex-col gap-4 border rounded-lg shadow-xl p-20'>
+        <form onSubmit={handleSubmit} className='max-w-2xl mx-4 sm:mx-auto mt-20 flex flex-col gap-4 border rounded-lg shadow-xl py-20 px-6 sm:p-20'>
             <h1 className='text-4xl text-center'>Sign Up</h1>
             <div className='mt-10'>
                 <label htmlFor="email">Email</label>
@@ -46,7 +48,7 @@ const SignUp = () => {
             <div className='text-center text-lg'>
                 <p>Already have an account? <span className='text-blue-500 cursor-pointer' onClick={() => navigate('/login')}>Login</span></p>
             </div>
-            <button disabled={!password || !email} className='bg-blue-600 py-4 rounded text-lg text-white font-medium tracking-wide hover:bg-blue-500' >Sign Up</button>
+            <button disabled={!password || !email} className='bg-blue-600 py-4 rounded text-lg text-white font-medium tracking-wide hover:bg-blue-500 cursor-pointer' onClick={handleSubmit} >Sign Up</button>
         </form>
     )
 }

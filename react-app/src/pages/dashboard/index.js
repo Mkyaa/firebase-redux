@@ -34,11 +34,6 @@ const Dashboard = () => {
     //react router dom
     const navigate = useNavigate()
 
-
-    useEffect(() => {
-        console.log(user)
-    }, [user])
-
     //signout
     const handleSignOut = async () => {
         try {
@@ -55,7 +50,6 @@ const Dashboard = () => {
     //change input
     const handleChange = (e) => {
         const { name, value } = e.target
-        console.log(name, value)
         switch (name) {
             case 'name':
                 setDisplayName(value)
